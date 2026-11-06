@@ -14,7 +14,12 @@
 <header class="top"><div class="brand"><div class="logo">ح</div><div>الحلو شات<small style="display:block">تواصل مستقل وآمن</small></div></div><small id="topStatus">معاينة أولية</small></header>
 <section id="welcome" class="screen active">
  <div class="welcome"><div class="biglogo">✉</div><h1>أهلاً في الحلو شات</h1><p>مساحة مستقلة للتواصل مع الأشخاص المسجلين بالتطبيق.<br>ابحث باسم المستخدم أو اكتشف جهات اتصالك.</p></div>
- <div class="panel"><label class="label">رقم هاتفك</label><div class="row"><select class="field country" aria-label="رمز الدولة"><option>🇩🇪 +49</option><option>🇸🇾 +963</option><option>🇹🇷 +90</option><option>🇸🇦 +966</option><option>🇦🇪 +971</option><option>🇺🇸 +1</option></select><input class="field" placeholder="أدخل رقم الهاتف" inputmode="tel"></div><button class="primary" onclick="showDemo()">متابعة برقم الهاتف</button><div class="notice">التسجيل الفعلي سيتطلب إرسال رمز تحقق SMS إلى رقمك. لم يتم ربط مزوّد رسائل أو تفعيل الحسابات في هذه النسخة.</div><div class="demo"><b>نسخة معاينة:</b> يمكنك استعراض شكل التطبيق وتجربة التنقل فقط. لا يتم إرسال رسائل حقيقية ولا إنشاء حساب فعلي حالياً.</div><button class="secondary" onclick="showApp()">استعراض واجهة التطبيق</button></div>
+ <div class="panel">
+ <div style="font-weight:800;font-size:15px;margin-bottom:10px">اختر طريقة التسجيل أو الدخول</div>
+ <button class="secondary" style="margin-top:0;background:#fff;border:1px solid #dce7e1;color:#26332f" onclick="authUnavailable('Google')"><span style="font-weight:900;margin-left:8px">G</span> المتابعة باستخدام Google</button>
+ <button class="secondary" style="background:#1877f2;color:#fff" onclick="authUnavailable('Facebook')"><span style="font-weight:900;margin-left:8px">f</span> المتابعة باستخدام Facebook</button>
+ <div style="display:flex;align-items:center;gap:10px;color:#84918b;font-size:12px;margin:15px 0"><span style="height:1px;background:#e5ece8;flex:1"></span>أو باستخدام رقم الهاتف<span style="height:1px;background:#e5ece8;flex:1"></span></div>
+ <label class="label">رقم هاتفك</label><div class="row"><select class="field country" aria-label="رمز الدولة"><option>🇩🇪 +49</option><option>🇸🇾 +963</option><option>🇹🇷 +90</option><option>🇸🇦 +966</option><option>🇦🇪 +971</option><option>🇺🇸 +1</option></select><input class="field" placeholder="أدخل رقم الهاتف" inputmode="tel"></div><button class="primary" onclick="showDemo()">متابعة برقم الهاتف</button><div class="notice">التسجيل الفعلي سيتطلب إرسال رمز تحقق SMS إلى رقمك. لم يتم ربط مزوّد رسائل أو تفعيل الحسابات في هذه النسخة.</div><div class="demo"><b>نسخة معاينة:</b> يمكنك استعراض شكل التطبيق وتجربة التنقل فقط. لا يتم إرسال رسائل حقيقية ولا إنشاء حساب فعلي حالياً.</div><button class="secondary" onclick="showApp()">استعراض واجهة التطبيق</button></div>
 </section>
 <section id="home" class="screen">
  <div class="section-head"><div><h2>المحادثات</h2><span class="muted">رسائلك ومحادثاتك</span></div><button class="secondary" style="width:auto;margin:0;padding:9px 12px" onclick="openTab('contacts')">＋ محادثة</button></div>
@@ -45,6 +50,7 @@
 <script>
 const screens=['welcome','home','contacts','search','profile','chat'];function show(id){screens.forEach(x=>document.getElementById(x).classList.toggle('active',x===id));document.getElementById('bottomNav').style.display=['welcome','chat'].includes(id)?'none':'flex';document.getElementById('topStatus').textContent=id==='welcome'?'معاينة أولية':'وضع المعاينة';}
 function showDemo(){alert('التفعيل عبر SMS غير مربوط بعد. استخدم «استعراض واجهة التطبيق» لمشاهدة النموذج.');}
+function authUnavailable(provider){alert('تسجيل '+provider+' لم يتم ربطه بعد. يلزم إعداد تطبيق OAuth والتحقق من إعداداته قبل تفعيل الدخول الحقيقي. لم يتم إنشاء حساب.');}
 function showApp(){show('home');}
 function openTab(id){show(id);document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));}
 function openChat(name,last,letter){document.getElementById('chatName').textContent=name;document.getElementById('chatAvatar').textContent=letter;document.getElementById('chatBody').innerHTML='<div class="bubble in">'+last+'</div><div class="bubble out">أهلاً وسهلاً، هذه معاينة للمحادثة.</div>';show('chat');}
