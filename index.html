@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#102b28"><meta name="description" content="الحلو شات - تطبيق مراسلة مستقل">
+<meta name="theme-color" content="#102b28"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon.svg" type="image/svg+xml"><meta name="description" content="الحلو شات - تطبيق مراسلة مستقل">
 <title>الحلو شات</title>
 <style>
 :root{--bg:#f3f6f4;--card:#fff;--ink:#172b27;--muted:#75827d;--green:#137c67;--green2:#0c5e50;--line:#e7eeea;--soft:#e8f4ef}
@@ -52,4 +52,5 @@ function sendMessage(){const i=document.getElementById('messageInput');if(!i.val
 function filterPeople(q,id){document.querySelectorAll('#'+id+' .person').forEach(p=>p.style.display=p.innerText.toLowerCase().includes(q.toLowerCase())?'flex':'none');}
 function searchUser(q){const r=document.getElementById('searchResults');if(!q.trim()){r.innerHTML='<b>ابحث عن أصدقائك</b>اكتب اسم مستخدم للعثور على الحساب.';return;}r.innerHTML='<b>نتيجة تجريبية</b>البحث الحقيقي يتطلب ربط قاعدة بيانات المستخدمين.';}
 function contactMode(btn,mode){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');}
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));}
 </script></body></html>
