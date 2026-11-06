@@ -16,7 +16,7 @@
  <div class="welcome"><div class="biglogo">✉</div><h1>أهلاً في الحلو شات</h1><p>مساحة مستقلة للتواصل مع الأشخاص المسجلين بالتطبيق.<br>ابحث باسم المستخدم أو اكتشف جهات اتصالك.</p></div>
  <div class="panel">
  <div style="font-weight:800;font-size:15px;margin-bottom:10px">اختر طريقة التسجيل أو الدخول</div>
- <button class="secondary" style="margin-top:0;background:#fff;border:1px solid #dce7e1;color:#26332f" onclick="authUnavailable('Google')"><span style="font-weight:900;margin-left:8px">G</span> المتابعة باستخدام Google</button>
+ <button class="secondary" style="margin-top:0;background:#fff;border:1px solid #dce7e1;color:#26332f" onclick="googleSignIn()"><span style="font-weight:900;margin-left:8px">G</span> المتابعة باستخدام Google</button>
  
  <div style="display:flex;align-items:center;gap:10px;color:#84918b;font-size:12px;margin:15px 0"><span style="height:1px;background:#e5ece8;flex:1"></span>أو باستخدام رقم الهاتف<span style="height:1px;background:#e5ece8;flex:1"></span></div>
  <label class="label">رقم هاتفك</label><div class="row"><select class="field country" aria-label="رمز الدولة"><option>🇩🇪 +49</option><option>🇸🇾 +963</option><option>🇹🇷 +90</option><option>🇸🇦 +966</option><option>🇦🇪 +971</option><option>🇺🇸 +1</option></select><input class="field" placeholder="أدخل رقم الهاتف" inputmode="tel"></div><button class="primary" onclick="showDemo()">متابعة برقم الهاتف</button><div class="notice">التسجيل الفعلي سيتطلب إرسال رمز تحقق SMS إلى رقمك. لم يتم ربط مزوّد رسائل أو تفعيل الحسابات في هذه النسخة.</div><div class="demo"><b>نسخة معاينة:</b> يمكنك استعراض شكل التطبيق وتجربة التنقل فقط. لا يتم إرسال رسائل حقيقية ولا إنشاء حساب فعلي حالياً.</div><button class="secondary" onclick="showApp()">استعراض واجهة التطبيق</button></div>
@@ -42,23 +42,44 @@
  <div class="search"><span>⌕</span><input id="userSearch" class="field" placeholder="مثلاً @alhloo2026" oninput="searchUser(this.value)"></div><div id="searchResults" class="empty"><b>ابحث عن أصدقائك</b>اكتب اسم مستخدم للعثور على الحساب.</div>
 </section>
 <section id="profile" class="screen">
- <div class="section-head"><h2>حسابي</h2></div><div class="panel profile"><div class="avatar">ح</div><h3>مستخدم تجريبي</h3><p>@demo_user</p><span class="pill">وضع المعاينة</span></div><div class="panel"><div class="person"><div class="meta"><strong>رقم الهاتف</strong><p>غير مربوط في نسخة المعاينة</p></div></div><div class="person"><div class="meta"><strong>الخصوصية</strong><p>إعدادات الظهور والحظر</p></div></div><div class="person"><div class="meta"><strong>الإشعارات</strong><p>تنبيهات الرسائل الجديدة</p></div></div><div class="person"><div class="meta"><strong>حول التطبيق</strong><p>الحلو شات · إصدار المعاينة</p></div></div></div>
+ <div class="section-head"><h2>حسابي</h2></div><div class="panel profile"><div class="avatar" id="profileAvatar">ح</div><h3 id="profileName">زائر</h3><p id="profileEmail">لم تسجل الدخول</p><span class="pill" id="profileState">وضع المعاينة</span><button class="secondary" id="signOutBtn" style="display:none" onclick="googleSignOut()">تسجيل الخروج</button></div><div class="panel"><div class="person"><div class="meta"><strong>رقم الهاتف</strong><p>غير مربوط في نسخة المعاينة</p></div></div><div class="person"><div class="meta"><strong>الخصوصية</strong><p>إعدادات الظهور والحظر</p></div></div><div class="person"><div class="meta"><strong>الإشعارات</strong><p>تنبيهات الرسائل الجديدة</p></div></div><div class="person"><div class="meta"><strong>حول التطبيق</strong><p>الحلو شات · إصدار المعاينة</p></div></div></div>
 </section>
 <section id="chat" class="screen"><div class="chathead"><button class="back" onclick="openTab('home')">›</button><div class="avatar" id="chatAvatar">أ</div><div><strong id="chatName">أحمد</strong><div class="muted">محادثة تجريبية</div></div></div><div class="chatbody" id="chatBody"><div class="bubble in">أهلاً! كيفك؟</div><div class="bubble out">أهلاً وسهلاً، تمام الحمد لله.</div></div><div class="composer"><input id="messageInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendMessage()"><button class="send" onclick="sendMessage()">➤</button></div><div class="muted" style="text-align:center;margin-top:8px">الإرسال هنا محلي للمعاينة فقط</div></section>
 <nav class="bottom" id="bottomNav" style="display:none"><button class="nav active" data-tab="home" onclick="openTab('home')"><b>▤</b>المحادثات</button><button class="nav" data-tab="contacts" onclick="openTab('contacts')"><b>♧</b>جهات الاتصال</button><button class="nav" data-tab="search" onclick="openTab('search')"><b>⌕</b>بحث</button><button class="nav" data-tab="profile" onclick="openTab('profile')"><b>◉</b>حسابي</button></nav>
 </main>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script>
+const firebaseConfig={apiKey:"AIzaSyBLhi--ZCnIN5U86EywBm1xDCUQ0RncK0w",authDomain:"alhloo1100.firebaseapp.com",projectId:"alhloo1100",storageBucket:"alhloo1100.firebasestorage.app",messagingSenderId:"568861798940",appId:"1:568861798940:web:47dfc637d0ee7b7da2e5d9"};
+let firebaseAuth=null;
+try{if(window.firebase){if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);firebaseAuth=firebase.auth();}}catch(e){console.error("Firebase initialization failed",e);}
 const screens=['welcome','home','contacts','search','profile','chat'];function show(id){screens.forEach(x=>document.getElementById(x).classList.toggle('active',x===id));document.getElementById('bottomNav').style.display=['welcome','chat'].includes(id)?'none':'flex';document.getElementById('topStatus').textContent=id==='welcome'?'معاينة أولية':'وضع المعاينة';}
 function showDemo(){alert('التفعيل عبر SMS غير مربوط بعد. استخدم «استعراض واجهة التطبيق» لمشاهدة النموذج.');}
-async function authUnavailable(provider){
- const key='google';
+async function googleSignIn(){
+ if(!firebaseAuth){alert("تعذر تحميل خدمة تسجيل الدخول. تحقق من اتصال الإنترنت ثم أعد المحاولة.");return;}
  try{
-  const response=await fetch('/api/auth/config',{cache:'no-store'});
-  const config=await response.json();
-  const state=config.providers&&config.providers[key];
-  if(state&&state.enabled){alert('إعداد '+provider+' معلن كجاهز، لكن تدفق تسجيل الدخول لم يُفعّل بعد في الواجهة.');return;}
-  alert('تسجيل Google غير مهيأ بعد على الخادم. لم يتم إنشاء حساب. يلزم إكمال ربط Firebase واختباره.');
- }catch(e){alert('تعذر التحقق من إعدادات تسجيل الدخول حالياً. لم يتم إنشاء حساب.');}
+  const provider=new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({prompt:"select_account"});
+  if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) await firebaseAuth.signInWithRedirect(provider);
+  else await firebaseAuth.signInWithPopup(provider);
+ }catch(e){
+  const messages={"auth/unauthorized-domain":"هذا النطاق غير مضاف إلى النطاقات المصرّح بها في Firebase.","auth/popup-closed-by-user":"تم إغلاق نافذة تسجيل الدخول قبل إكمالها.","auth/popup-blocked":"المتصفح منع النافذة المنبثقة. اسمح بالنوافذ المنبثقة أو أعد المحاولة.","auth/network-request-failed":"تعذر الاتصال. تحقق من الإنترنت."};
+  alert(messages[e.code]||("تعذر تسجيل الدخول: "+(e.message||e.code||"خطأ غير معروف")));
+ }
+}
+async function googleSignOut(){if(!firebaseAuth)return;try{await firebaseAuth.signOut();show("welcome");}catch(e){alert("تعذر تسجيل الخروج حالياً.");}}
+if(firebaseAuth){
+ firebaseAuth.getRedirectResult().catch(e=>console.error("Google redirect result",e));
+ firebaseAuth.onAuthStateChanged(user=>{
+  const name=user?(user.displayName||"مستخدم Google"):"زائر";
+  document.getElementById("profileName").textContent=name;
+  document.getElementById("profileEmail").textContent=user?(user.email||"حساب Google"):"لم تسجل الدخول";
+  document.getElementById("profileAvatar").textContent=user?(name.trim().charAt(0)||"ح"):"ح";
+  document.getElementById("profileState").textContent=user?"تم تسجيل الدخول عبر Google":"وضع المعاينة";
+  document.getElementById("signOutBtn").style.display=user?"block":"none";
+  document.getElementById("topStatus").textContent=user?"متصل بحساب Google":"معاينة أولية";
+  if(user)show("home");
+ });
 }
 function showApp(){show('home');}
 function openTab(id){show(id);document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));}
