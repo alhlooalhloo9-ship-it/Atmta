@@ -58,28 +58,40 @@ function showDemo(){alert('التفعيل عبر SMS غير مربوط بعد. �
 async function googleSignIn(){
  if(!firebaseAuth){alert("تعذر تحميل خدمة تسجيل الدخول. تحقق من اتصال الإنترنت ثم أعد المحاولة.");return;}
  try{
+  await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
   const provider=new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({prompt:"select_account"});
-  if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
-   await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-   await firebaseAuth.signInWithRedirect(provider);
-  }else await firebaseAuth.signInWithPopup(provider);
+  // Try popup first: it avoids losing redirect state when mobile browsers return from Google's page.
+  try{
+   const result=await firebaseAuth.signInWithPopup(provider);
+   if(result&&result.user)show("home");
+  }catch(popupError){
+   const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+   if(mobile&&["auth/popup-blocked","auth/operation-not-supported-in-this-environment","auth/web-storage-unsupported"].includes(popupError.code)){
+    sessionStorage.setItem("alhloo_google_redirect_pending","1");
+    await firebaseAuth.signInWithRedirect(provider);
+    return;
+   }
+   throw popupError;
+  }
  }catch(e){
-  const messages={"auth/unauthorized-domain":"هذا النطاق غير مضاف إلى النطاقات المصرّح بها في Firebase.","auth/popup-closed-by-user":"تم إغلاق نافذة تسجيل الدخول قبل إكمالها.","auth/popup-blocked":"المتصفح منع النافذة المنبثقة. اسمح بالنوافذ المنبثقة أو أعد المحاولة.","auth/network-request-failed":"تعذر الاتصال. تحقق من الإنترنت."};
+  const messages={"auth/unauthorized-domain":"النطاق غير مصرح به في Firebase. تأكد من إضافة alhloo-chat.vercel.app.","auth/popup-closed-by-user":"أغلقت نافذة Google قبل إكمال تسجيل الدخول.","auth/popup-blocked":"المتصفح منع نافذة Google. اسمح بالنوافذ المنبثقة للموقع وأعد المحاولة.","auth/operation-not-allowed":"تسجيل الدخول باستخدام Google غير مفعّل في Firebase Authentication.","auth/network-request-failed":"تعذر الاتصال بخدمة Google أو Firebase. تحقق من الإنترنت.","auth/web-storage-unsupported":"المتصفح منع التخزين اللازم لتسجيل الدخول."};
   alert(messages[e.code]||("تعذر تسجيل الدخول: "+(e.message||e.code||"خطأ غير معروف")));
  }
 }
 async function googleSignOut(){if(!firebaseAuth)return;try{await firebaseAuth.signOut();show("welcome");}catch(e){alert("تعذر تسجيل الخروج حالياً.");}}
 if(firebaseAuth){
  firebaseAuth.getRedirectResult().then(result=>{
-  if(result&&result.user){
-   document.getElementById("topStatus").textContent="تم تسجيل الدخول عبر Google";
-   show("home");
+  sessionStorage.removeItem("alhloo_google_redirect_pending");
+  if(result&&result.user)show("home");
+  else if(sessionStorage.getItem("alhloo_google_redirect_pending")==="1"){
+   sessionStorage.removeItem("alhloo_google_redirect_pending");
+   alert("رجع Google بدون تأكيد جلسة الدخول. جرّب تسجيل الدخول مرة أخرى، وإذا تكرر الأمر سنحتاج فحص إعداد OAuth في Firebase.");
   }
  }).catch(e=>{
+  sessionStorage.removeItem("alhloo_google_redirect_pending");
   console.error("Google redirect result",e);
-  const messages={"auth/unauthorized-domain":"النطاق غير مصرح به في Firebase. تأكد من إضافة alhloo-chat.vercel.app.","auth/operation-not-allowed":"تسجيل الدخول باستخدام Google غير مفعّل في Firebase Authentication.","auth/network-request-failed":"تعذر الاتصال بخدمة Google أو Firebase. تحقق من الإنترنت وأعد المحاولة.","auth/web-storage-unsupported":"المتصفح منع التخزين اللازم لإكمال تسجيل الدخول. اسمح بملفات الارتباط والتخزين للموقع."};
-  alert(messages[e.code]||("لم يكتمل تسجيل الدخول عبر Google: "+(e.message||e.code||"خطأ غير معروف")));
+  alert("لم يكتمل تسجيل الدخول عبر Google ("+(e.code||"unknown")+"): "+(e.message||"يرجى المحاولة مجدداً."));
  });
  firebaseAuth.onAuthStateChanged(user=>{
   const name=user?(user.displayName||"مستخدم Google"):"زائر";
