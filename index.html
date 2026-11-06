@@ -17,7 +17,7 @@
  <div class="panel">
  <div style="font-weight:800;font-size:15px;margin-bottom:10px">اختر طريقة التسجيل أو الدخول</div>
  <button class="secondary" style="margin-top:0;background:#fff;border:1px solid #dce7e1;color:#26332f" onclick="authUnavailable('Google')"><span style="font-weight:900;margin-left:8px">G</span> المتابعة باستخدام Google</button>
- <button class="secondary" style="background:#1877f2;color:#fff" onclick="authUnavailable('Facebook')"><span style="font-weight:900;margin-left:8px">f</span> المتابعة باستخدام Facebook</button>
+ 
  <div style="display:flex;align-items:center;gap:10px;color:#84918b;font-size:12px;margin:15px 0"><span style="height:1px;background:#e5ece8;flex:1"></span>أو باستخدام رقم الهاتف<span style="height:1px;background:#e5ece8;flex:1"></span></div>
  <label class="label">رقم هاتفك</label><div class="row"><select class="field country" aria-label="رمز الدولة"><option>🇩🇪 +49</option><option>🇸🇾 +963</option><option>🇹🇷 +90</option><option>🇸🇦 +966</option><option>🇦🇪 +971</option><option>🇺🇸 +1</option></select><input class="field" placeholder="أدخل رقم الهاتف" inputmode="tel"></div><button class="primary" onclick="showDemo()">متابعة برقم الهاتف</button><div class="notice">التسجيل الفعلي سيتطلب إرسال رمز تحقق SMS إلى رقمك. لم يتم ربط مزوّد رسائل أو تفعيل الحسابات في هذه النسخة.</div><div class="demo"><b>نسخة معاينة:</b> يمكنك استعراض شكل التطبيق وتجربة التنقل فقط. لا يتم إرسال رسائل حقيقية ولا إنشاء حساب فعلي حالياً.</div><button class="secondary" onclick="showApp()">استعراض واجهة التطبيق</button></div>
 </section>
@@ -51,13 +51,13 @@
 const screens=['welcome','home','contacts','search','profile','chat'];function show(id){screens.forEach(x=>document.getElementById(x).classList.toggle('active',x===id));document.getElementById('bottomNav').style.display=['welcome','chat'].includes(id)?'none':'flex';document.getElementById('topStatus').textContent=id==='welcome'?'معاينة أولية':'وضع المعاينة';}
 function showDemo(){alert('التفعيل عبر SMS غير مربوط بعد. استخدم «استعراض واجهة التطبيق» لمشاهدة النموذج.');}
 async function authUnavailable(provider){
- const key=provider==='Google'?'google':'facebook';
+ const key='google';
  try{
   const response=await fetch('/api/auth/config',{cache:'no-store'});
   const config=await response.json();
   const state=config.providers&&config.providers[key];
   if(state&&state.enabled){alert('إعداد '+provider+' معلن كجاهز، لكن تدفق تسجيل الدخول لم يُفعّل بعد في الواجهة.');return;}
-  alert('تسجيل '+provider+' غير مهيأ بعد على الخادم. لم يتم إنشاء حساب. يلزم إعداد مشروع المصادقة المستقل وتفعيل المزود واختباره.');
+  alert('تسجيل Google غير مهيأ بعد على الخادم. لم يتم إنشاء حساب. يلزم إكمال ربط Firebase واختباره.');
  }catch(e){alert('تعذر التحقق من إعدادات تسجيل الدخول حالياً. لم يتم إنشاء حساب.');}
 }
 function showApp(){show('home');}
