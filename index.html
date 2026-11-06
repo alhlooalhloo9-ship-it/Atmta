@@ -82,12 +82,10 @@ async function googleSignIn(){
 async function googleSignOut(){if(!firebaseAuth)return;try{await firebaseAuth.signOut();show("welcome");}catch(e){alert("تعذر تسجيل الخروج حالياً.");}}
 if(firebaseAuth){
  firebaseAuth.getRedirectResult().then(result=>{
+  const wasRedirectPending=sessionStorage.getItem("alhloo_google_redirect_pending")==="1";
   sessionStorage.removeItem("alhloo_google_redirect_pending");
   if(result&&result.user)show("home");
-  else if(sessionStorage.getItem("alhloo_google_redirect_pending")==="1"){
-   sessionStorage.removeItem("alhloo_google_redirect_pending");
-   alert("رجع Google بدون تأكيد جلسة الدخول. جرّب تسجيل الدخول مرة أخرى، وإذا تكرر الأمر سنحتاج فحص إعداد OAuth في Firebase.");
-  }
+  else if(wasRedirectPending)alert("رجع Google بدون تأكيد جلسة الدخول. جرّب تسجيل الدخول مرة أخرى، وإذا تكرر الأمر سنحتاج فحص إعداد OAuth في Firebase.");
  }).catch(e=>{
   sessionStorage.removeItem("alhloo_google_redirect_pending");
   console.error("Google redirect result",e);
