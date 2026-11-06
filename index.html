@@ -50,7 +50,16 @@
 <script>
 const screens=['welcome','home','contacts','search','profile','chat'];function show(id){screens.forEach(x=>document.getElementById(x).classList.toggle('active',x===id));document.getElementById('bottomNav').style.display=['welcome','chat'].includes(id)?'none':'flex';document.getElementById('topStatus').textContent=id==='welcome'?'معاينة أولية':'وضع المعاينة';}
 function showDemo(){alert('التفعيل عبر SMS غير مربوط بعد. استخدم «استعراض واجهة التطبيق» لمشاهدة النموذج.');}
-function authUnavailable(provider){alert('تسجيل '+provider+' لم يتم ربطه بعد. يلزم إعداد تطبيق OAuth والتحقق من إعداداته قبل تفعيل الدخول الحقيقي. لم يتم إنشاء حساب.');}
+async function authUnavailable(provider){
+ const key=provider==='Google'?'google':'facebook';
+ try{
+  const response=await fetch('/api/auth/config',{cache:'no-store'});
+  const config=await response.json();
+  const state=config.providers&&config.providers[key];
+  if(state&&state.enabled){alert('إعداد '+provider+' معلن كجاهز، لكن تدفق تسجيل الدخول لم يُفعّل بعد في الواجهة.');return;}
+  alert('تسجيل '+provider+' غير مهيأ بعد على الخادم. لم يتم إنشاء حساب. يلزم إعداد مشروع المصادقة المستقل وتفعيل المزود واختباره.');
+ }catch(e){alert('تعذر التحقق من إعدادات تسجيل الدخول حالياً. لم يتم إنشاء حساب.');}
+}
 function showApp(){show('home');}
 function openTab(id){show(id);document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));}
 function openChat(name,last,letter){document.getElementById('chatName').textContent=name;document.getElementById('chatAvatar').textContent=letter;document.getElementById('chatBody').innerHTML='<div class="bubble in">'+last+'</div><div class="bubble out">أهلاً وسهلاً، هذه معاينة للمحادثة.</div>';show('chat');}
